@@ -2,7 +2,14 @@ import urllib2
 import re
 import csv
 
+''' Dictionary that contains all information to be written to a csv file. '''
 data = {}
+
+'''
+Dictionary with Drake's albums as keys and songs in that album as values.
+The song names are formatted in a way that's consistent with the genius url
+for that song
+'''
 songdict = {'So Far Gone': ['houstatlantavegas', 'successful', 'best-i-ever-had',
                             'uptown', 'im-goin-in', 'the-calm', 'fear'],
             'Thank Me Later': ['fireworks', 'karaoke', 'the-resistance',
@@ -63,6 +70,8 @@ songdict = {'So Far Gone': ['houstatlantavegas', 'successful', 'best-i-ever-had'
                            'gods-plan', 'im-upset', '8-out-of-10', 'mob-ties',
                            'cant-take-a-joke', 'sandras-rose', 'talk-up',
                            'is-there-more']}
+
+''' Words chosen to be ignored when creating a word frequency dictionary. '''
 stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you",
              "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself",
              "she", "her", "hers", "herself", "it", "its", "itself", "they", "them",
@@ -76,8 +85,12 @@ stopwords = ["i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you",
              "further", "then", "once", "here", "there", "when", "where", "why", "how",
              "all", "any", "both", "each", "few", "more", "most", "other", "some",
              "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too",
-             "very", "s", "t", "can", "will", "just", "dont", "should", "now"]
+             "very", "can", "will", "just", "dont", "should", "now"]
 
+'''
+Dictionary with song names as keys and Spotify plays, duration of song,
+and binary indicator of whether the song is explicit or not as values.
+'''
 stats = {'houstatlantavegas': [18326460, 290, 1], 'successful': [25909079, 352, 1],
          'best-i-ever-had': [156391937, 258, 1], 'uptown': [23870145, 381, 1],
          'im-goin-in': [43785506, 225, 1], 'the-calm': [8186271, 246, 1],
@@ -158,13 +171,16 @@ stats = {'houstatlantavegas': [18326460, 290, 1], 'successful': [25909079, 352, 
          'cant-take-a-joke': [74232844, 164, 1], 'sandras-rose': [50147558, 216, 1],
          'talk-up': [57385371, 223, 1], 'is-there-more': [37178759, 227, 1]}
 
+''' Dictionary with album name as key and release year as value. '''
 releasedOn = {"Thank Me Later": 2010, "Take Care": 2011, "Nothing Was The Same": 2013,
               "Views": 2016, "Scorpion A": 2018, "Scorpion B": 2018, "More Life": 2017,
               "What A Time To Be Alive": 2015, "If You\'re Reading This It\'s Too Late": 2015,
               "So Far Gone": 2009}
 
-# Parses HTML from Genius URL's and returns text with removed non-alphanumeric
-# characters
+'''
+Parses HTML from Genius URL's and returns text with removed non-alphanumeric
+characters.
+'''
 
 
 def parseHTMLforLyrics(pageContents):
@@ -190,7 +206,10 @@ def parseHTMLforLyrics(pageContents):
     removeNonAlphaNum = re.sub(r'[^a-zA-Z\ ]', "", removeNL)
     return removeNonAlphaNum.split()
 
-# Create a frequency dictionary given an array of strings in decreasing order
+
+'''
+Create a frequency dictionary given an array of strings.
+'''
 
 
 def textToFreqDict(wordArr):
@@ -198,7 +217,8 @@ def textToFreqDict(wordArr):
     freqdict = dict(zip(wordArr, wordfreq))
     return freqdict
 
-# Create a frequency dictionary given a url
+
+''' Create a frequency dictionary given a url.'''
 
 
 def URLtoFreqDict(url):
@@ -207,6 +227,14 @@ def URLtoFreqDict(url):
     html = response.read()
     wordArr = parseHTMLforLyrics(html)
     return textToFreqDict(wordArr)
+
+
+'''
+Creates a word frequency dictionary for each song in each album and:
+1. adds the word count for each song to the stats dictionary
+2. adds the word frequency to a metadata dictionary in order to retrieve the top
+   15 most frequent words.
+'''
 
 
 def getTop15():
@@ -234,6 +262,10 @@ def getTop15():
     return words[: 15]
 
 
+''' This method removes all stopwords from a given word frequency dictionary.
+    Could not use the 'not in' operator for some reason.'''
+
+
 def removeStopWords(wordDict):
     stopwordDict = dict(zip(stopwords, stopwords))
     for key, stopword in stopwordDict.iteritems():
@@ -242,9 +274,17 @@ def removeStopWords(wordDict):
     return wordDict
 
 
+'''
+Populates the rows of our data dictionary in order to later create a csv file.
+Rows are populated first with release date, and then the 15 most frequent words
+from each song are retrieved. Given these words, their word frequency is recorded
+in the data dictionary.
+'''
+
+
 def populateRows():
-    keys = getTop15()
     addYears()
+    keys = getTop15()
     for albums, songs in songdict.iteritems():
         for i in range(len(songs)):
             data[songs[i]] = []
@@ -262,10 +302,20 @@ def populateRows():
             data[songs].append(info[j])
 
 
+''' Adds the released years to the stats dictionary.'''
+
+
 def addYears():
     for albums, songs in songdict.iteritems():
         for i in range(len(songs)):
             stats[songs[i]].append(releasedOn[albums])
+
+
+'''
+After populating the data dictionary, this method creates a csv file that records
+all the elements in 'myFields' as columns and their corresponding data for each
+song.
+'''
 
 
 def makeCSV():
