@@ -242,7 +242,7 @@ def getTop15():
     for albums, songs in songdict.iteritems():
         for i in range(len(songs)):
             url = 'https://genius.com/Drake-'+songs[i]+'-lyrics'
-            print(songs[i])  # keeps track of progress
+            print(songs[i])  # to keep track of progress
             freqDict = URLtoFreqDict(url)
             totalWords = 0
             for key, value in freqDict.iteritems():
@@ -284,12 +284,11 @@ in the data dictionary.
 
 def populateRows():
     addYears()
-    print(mostFreq)
     for albums, songs in songdict.iteritems():
         for i in range(len(songs)):
             data[songs[i]] = []
             url = 'https://genius.com/Drake-'+songs[i]+'-lyrics'
-            print(songs[i])
+            print(songs[i])  # to keep track of progress
             freqDict = URLtoFreqDict(url)
             data[songs[i]].append(albums)
             for word in mostFreq:
