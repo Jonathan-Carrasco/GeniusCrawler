@@ -242,7 +242,7 @@ def getTop15():
     for albums, songs in songdict.iteritems():
         for i in range(len(songs)):
             url = 'https://genius.com/Drake-'+songs[i]+'-lyrics'
-            print(songs[i])
+            print(songs[i])  # keeps track of progress
             freqDict = URLtoFreqDict(url)
             totalWords = 0
             for key, value in freqDict.iteritems():
@@ -284,7 +284,7 @@ in the data dictionary.
 
 def populateRows():
     addYears()
-    keys = getTop15()
+    print(mostFreq)
     for albums, songs in songdict.iteritems():
         for i in range(len(songs)):
             data[songs[i]] = []
@@ -292,7 +292,7 @@ def populateRows():
             print(songs[i])
             freqDict = URLtoFreqDict(url)
             data[songs[i]].append(albums)
-            for word in keys:
+            for word in mostFreq:
                 if word in freqDict:
                     data[songs[i]].append(freqDict[word])
                 else:
@@ -322,18 +322,20 @@ def makeCSV():
     populateRows()
     myFile = open('unfiltered.csv', 'w')
     with myFile:
-        myFields = ['song', 'album', 'I\'m', 'know', 'like', 'yeah', 'got', 'get',
-                    'don\'t', 'shit', 'go', 'girl', 'that\s', 'need', 'niggas',
-                    'time', 'love', 'spotifyPlays', 'duration', 'explicit',
-                    'wordCount', 'yearReleased']
+        myFields = ['song', 'album']
+        myFields.extend(mostFreq)
+        myFields.extend(['spotifyPlays', 'duration', 'explicit', 'wordCount', 'yearReleased'])
         writer = csv.DictWriter(myFile, fieldnames=myFields)
         writer.writeheader()
         for songs, songAttributes in data.iteritems():
             row = {}
             row[myFields[0]] = songs
             for i in range(len(songAttributes)):
+                print(i)
+                print(myFields[i])
                 row[myFields[i+1]] = songAttributes[i]
             writer.writerow(row)
 
 
+mostFreq = getTop15()
 makeCSV()
