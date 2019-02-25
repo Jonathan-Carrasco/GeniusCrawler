@@ -4,5 +4,5 @@ This python script takes url names and, after determining the 15 most frequent w
 # File Summary
 The unfiltered csv file contains the 15 most frequent words, including stopwords. 
 The filtered csv file contains the 15 most frequent words, excluding stopwords.
-Since Drake had a few songs that were very popular, these were considered outliers and made the regression models difficult to use. Therefore, I trimmed the outer 5% of songs based on spotify plays, and pdfs ending with wP shoud be read as "with these points" while pdfs ending with w
+Since Drake had a few songs that were very popular, these were considered outliers and made the regression models difficult to use. Therefore, I trimmed the outer 5% of songs based on spotify plays, and pdfs ending with wP shoud be read as "with these points" while pdfs ending with wOP should be read as "without these points."
 
